@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingRight="3dp"
+    tools:context="com.gioppl.swipedeleteview.MainActivity">
+
+    <com.gioppl.swipedeleteview.SwipeDeleteLayout
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="50dp"
+            android:background="#f90404"
+            android:gravity="center"
+            android:text="删除" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="#dddddd"
+            android:gravity="center"
+            android:text="滑动可以删除" />
+
+
+
+
+    </com.gioppl.swipedeleteview.SwipeDeleteLayout>
+
+</LinearLayout>
