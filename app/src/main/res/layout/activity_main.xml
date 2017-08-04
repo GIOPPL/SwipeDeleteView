@@ -12,20 +12,22 @@
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:orientation="horizontal">
-        <TextView
-            android:layout_width="80dp"
-            android:layout_height="50dp"
-            android:background="#f90404"
-            android:gravity="center"
-            android:text="删除" />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:background="#dddddd"
             android:gravity="center"
+            android:translationZ="2dp"
             android:text="滑动可以删除" />
 
-
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="50dp"
+            android:background="#f90404"
+            android:gravity="center"
+            android:translationZ="1dp"
+            android:text="删除" />
 
 
     </com.gioppl.swipedeleteview.SwipeDeleteLayout>
