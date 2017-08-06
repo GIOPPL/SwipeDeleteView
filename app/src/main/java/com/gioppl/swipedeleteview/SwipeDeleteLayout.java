@@ -3,6 +3,7 @@ package com.gioppl.swipedeleteview;
 import android.content.Context;
 import android.graphics.Point;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -22,6 +23,7 @@ public class SwipeDeleteLayout extends LinearLayout {
     private int sizeHeight;//控件的宽度
     private int sizeWidth;//控件的高度
     private int freeWidth;//空闲的区域
+    private int MXA_OPEN_VELOCITY = 400;
 
     public SwipeDeleteLayout(Context context) {
         super(context);
@@ -55,12 +57,12 @@ public class SwipeDeleteLayout extends LinearLayout {
 
             @Override//水平的移动
             public int clampViewPositionHorizontal(View child, int left, int dx) {
-//                tv_delete.setVisibility(View.VISIBLE);
-                tv_delete.layout(tv_swipe.getMeasuredWidth()+freeWidth,0,
-                        tv_swipe.getMeasuredWidth()+freeWidth+tv_delete.getMeasuredWidth(),tv_delete.getMeasuredHeight());
-//                if (child==tv_swipe){
-//                    if (dx>tv_delete.getMeasuredWidth()) return tv_delete.getMeasuredWidth();
-//                }
+                if (child == tv_swipe) {
+                    if (-left >= tv_delete.getMeasuredWidth()) {
+                        return tv_delete.getMeasuredWidth() * -1;
+                    } else if (left > 0)
+                        return 0;
+                }
                 return left;
             }
 
@@ -73,6 +75,16 @@ public class SwipeDeleteLayout extends LinearLayout {
 
             @Override//手指释放的时候回调
             public void onViewReleased(View releasedChild, float xvel, float yvel) {
+                super.onViewReleased(releasedChild, xvel, yvel);
+//                log(tv_swipe.getTop() + "," + tv_swipe.getLeft());
+                log(xvel+"#"+yvel);
+                if (xvel < 0) {
+                    viewDragHelper.smoothSlideViewTo(tv_swipe, -240, 0);
+                    ViewCompat.postInvalidateOnAnimation(SwipeDeleteLayout.this);
+                } else if (yvel > 0) {
+                    viewDragHelper.smoothSlideViewTo(tv_swipe, 0, 0);
+                    ViewCompat.postInvalidateOnAnimation(SwipeDeleteLayout.this);
+                }
             }
 
             @Override//获取view水平方向的拖拽范围,但是目前不能限制边界,返回的值目前用在手指抬起的时候view缓慢移动的动画世界的计算上面; 最好不要返回0
@@ -92,7 +104,8 @@ public class SwipeDeleteLayout extends LinearLayout {
             public void onViewPositionChanged(View changedView, int left, int top,
                                               int dx, int dy) {
                 super.onViewPositionChanged(changedView, left, top, dx, dy);
-                tv_delete.layout(tv_swipe.getMeasuredWidth()+freeWidth,0,tv_swipe.getMeasuredWidth()+freeWidth+tv_delete.getMeasuredWidth(),tv_delete.getMeasuredHeight());//(int l, int t,int r,int b)
+                tv_delete.layout(tv_swipe.getMeasuredWidth() + freeWidth, 0, tv_swipe.getMeasuredWidth() + freeWidth + tv_delete.getMeasuredWidth(), tv_delete.getMeasuredHeight());//(int l, int t,int r,int b)
+
 
             }
 
@@ -145,18 +158,19 @@ public class SwipeDeleteLayout extends LinearLayout {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        tv_swipe = getChildAt(1);//滑动的那个view
-        tv_delete = getChildAt(0);//点击删除的那个view
-
+        tv_swipe = getChildAt(0);//滑动的那个view
+        tv_delete = getChildAt(1);//点击删除的那个view
+        tv_delete.setTranslationZ(1);
+        tv_swipe.setTranslationZ(2);
     }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
         freeWidth = sizeWidth - tv_delete.getMeasuredWidth() - tv_swipe.getMeasuredWidth();
-        tv_delete.setVisibility(View.GONE);
-        log(freeWidth);
-        log(tv_delete.getMeasuredWidth() + "," + tv_swipe.getMeasuredWidth());
+//        tv_delete.setVisibility(View.GONE);
+//        log(freeWidth);
+//        log(tv_delete.getMeasuredWidth() + "," + tv_swipe.getMeasuredWidth());
     }
 
     @Override
@@ -166,6 +180,13 @@ public class SwipeDeleteLayout extends LinearLayout {
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         sizeWidth = MeasureSpec.getSize(widthMeasureSpec);
         sizeHeight = MeasureSpec.getSize(heightMeasureSpec);
+    }
+
+    @Override
+    public void computeScroll() {
+        if (viewDragHelper.continueSettling(true)) {
+            invalidate();
+        }
     }
 
     private void log(String text) {
