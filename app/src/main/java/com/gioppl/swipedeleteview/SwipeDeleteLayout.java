@@ -51,8 +51,7 @@ public class SwipeDeleteLayout extends LinearLayout {
         viewDragHelper = ViewDragHelper.create(this, 1.0f, new ViewDragHelper.Callback() {
             @Override//返回true则表示可以捕获该view
             public boolean tryCaptureView(View child, int pointerId) {
-                if (child == tv_swipe) return true;
-                return false;
+                return child == tv_swipe;
             }
 
             @Override//水平的移动
