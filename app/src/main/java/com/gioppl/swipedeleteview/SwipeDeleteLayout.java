@@ -24,6 +24,7 @@ public class SwipeDeleteLayout extends LinearLayout {
     private int sizeWidth;//控件的高度
     private int freeWidth;//空闲的区域
     private int MXA_OPEN_VELOCITY = 400;
+    private boolean left_swipe = true;//判断左右滑动的
 
     public SwipeDeleteLayout(Context context) {
         super(context);
@@ -47,7 +48,6 @@ public class SwipeDeleteLayout extends LinearLayout {
     }
 
     private void init() {
-
         viewDragHelper = ViewDragHelper.create(this, 1.0f, new ViewDragHelper.Callback() {
             @Override//返回true则表示可以捕获该view
             public boolean tryCaptureView(View child, int pointerId) {
@@ -56,12 +56,14 @@ public class SwipeDeleteLayout extends LinearLayout {
 
             @Override//水平的移动
             public int clampViewPositionHorizontal(View child, int left, int dx) {
+                log(left + "," + dx);
                 if (child == tv_swipe) {
                     if (-left >= tv_delete.getMeasuredWidth()) {
                         return tv_delete.getMeasuredWidth() * -1;
                     } else if (left > 0)
                         return 0;
                 }
+                left_swipe = dx <= 0;
                 return left;
             }
 
@@ -76,13 +78,21 @@ public class SwipeDeleteLayout extends LinearLayout {
             public void onViewReleased(View releasedChild, float xvel, float yvel) {
                 super.onViewReleased(releasedChild, xvel, yvel);
 //                log(tv_swipe.getTop() + "," + tv_swipe.getLeft());
-                log(xvel+"#"+yvel);
-                if (xvel < 0) {
+//                log(xvel+"#"+yvel);
+                if (xvel < 0) {//左边
                     viewDragHelper.smoothSlideViewTo(tv_swipe, -240, 0);
                     ViewCompat.postInvalidateOnAnimation(SwipeDeleteLayout.this);
-                } else if (yvel > 0) {
+                } else if (xvel > 0) {//右边
                     viewDragHelper.smoothSlideViewTo(tv_swipe, 0, 0);
                     ViewCompat.postInvalidateOnAnimation(SwipeDeleteLayout.this);
+                } else {//xvel==0的时候触发
+                    if (left_swipe) {
+                        viewDragHelper.smoothSlideViewTo(tv_swipe, -240, 0);
+                        ViewCompat.postInvalidateOnAnimation(SwipeDeleteLayout.this);
+                    } else {
+                        viewDragHelper.smoothSlideViewTo(tv_swipe, 0, 0);
+                        ViewCompat.postInvalidateOnAnimation(SwipeDeleteLayout.this);
+                    }
                 }
             }
 
